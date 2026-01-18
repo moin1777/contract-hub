@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Contract } from '../../types/contract';
+import type { Contract } from '../types/contract';
 import { Calendar, DollarSign, User, MoreVertical, Eye, Edit, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

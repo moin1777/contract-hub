@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, FileText, CheckCircle, Clock, XCircle, DollarSign } from 'lucide-react';
-import { useAppSelector } from '../../store/hooks';
-import StatCard from '../../components/StatCard';
-import ContractCard from '../../components/ContractCard';
-import EmptyState from '../../components/EmptyState';
-import { useAppDispatch } from '../../store/hooks';
-import { deleteContract } from '../../store/contractSlice';
+import { useAppSelector } from '../store/hooks';
+import StatCard from '../components/StatCard';
+import ContractCard from '../components/ContractCard';
+import EmptyState from '../components/EmptyState';
+import { useAppDispatch } from '../store/hooks';
+import { deleteContract } from '../store/contractSlice';
 
 const Dashboard: React.FC = () => {
   const dispatch = useAppDispatch();

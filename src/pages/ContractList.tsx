@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Plus } from 'lucide-react';
-import { useAppSelector, useAppDispatch } from '../../store/hooks';
-import { deleteContract, setSearchQuery, setFilterStatus } from '../../store/contractSlice';
-import ContractCard from '../../components/ContractCard';
-import SearchFilter from '../../components/SearchFilter';
-import EmptyState from '../../components/EmptyState';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import { deleteContract, setSearchQuery, setFilterStatus } from '../store/contractSlice';
+import ContractCard from '../components/ContractCard';
+import SearchFilter from '../components/SearchFilter';
+import EmptyState from '../components/EmptyState';
 
 const ContractList: React.FC = () => {
   const dispatch = useAppDispatch();

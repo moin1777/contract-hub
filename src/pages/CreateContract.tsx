@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { useAppDispatch } from '../../store/hooks';
-import { addContract } from '../../store/contractSlice';
-import ContractForm from '../../components/ContractForm';
-import BlueprintSelector from '../../components/BlueprintSelector';
-import type { ContractFormData } from '../../types/contract';
-import type { Blueprint } from '../../types/blueprint';
+import { useAppDispatch } from '../store/hooks';
+import { addContract } from '../store/contractSlice';
+import ContractForm from '../components/ContractForm';
+import BlueprintSelector from '../components/BlueprintSelector';
+import type { ContractFormData } from '../types/contract';
+import type { Blueprint } from '../types/blueprint';
 
 type CreateStep = 'blueprint' | 'form';
 

@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Edit, Trash2, Calendar, DollarSign, User, Clock } from 'lucide-react';
-import { useAppSelector, useAppDispatch } from '../../store/hooks';
-import { deleteContract } from '../../store/contractSlice';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import { deleteContract } from '../store/contractSlice';
 
 const ContractDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();

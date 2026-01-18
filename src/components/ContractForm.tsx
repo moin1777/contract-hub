@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { ContractFormData, ContractStatus, Contract } from '../../types/contract';
+import type { ContractFormData, ContractStatus, Contract } from '../types/contract';
 
 interface ContractFormProps {
   initialData?: Contract | Partial<ContractFormData>;

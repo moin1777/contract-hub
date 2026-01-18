@@ -12,8 +12,8 @@ import {
   ArrowRight,
   X
 } from 'lucide-react';
-import type { Blueprint, BlueprintCategory } from '../../types/blueprint';
-import { defaultBlueprints, blueprintCategories } from '../../types/blueprint';
+import type { Blueprint, BlueprintCategory } from '../types/blueprint';
+import { defaultBlueprints, blueprintCategories } from '../types/blueprint';
 
 interface BlueprintSelectorProps {
   onSelect: (blueprint: Blueprint | null) => void;

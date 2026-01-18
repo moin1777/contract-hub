@@ -1,10 +1,10 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { useAppSelector, useAppDispatch } from '../../store/hooks';
-import { updateContract } from '../../store/contractSlice';
-import ContractForm from '../../components/ContractForm';
-import type { ContractFormData } from '../../types/contract';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import { updateContract } from '../store/contractSlice';
+import ContractForm from '../components/ContractForm';
+import type { ContractFormData } from '../types/contract';
 
 const EditContract: React.FC = () => {
   const { id } = useParams<{ id: string }>();

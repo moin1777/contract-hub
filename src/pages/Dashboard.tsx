@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, FileText, CheckCircle, Clock, XCircle, DollarSign } from 'lucide-react';
+import { Plus, FileText, Clock, Lock, DollarSign, FileSignature } from 'lucide-react';
 import { useAppSelector } from '../store/hooks';
 import StatCard from '../components/StatCard';
 import ContractCard from '../components/ContractCard';
@@ -14,9 +14,9 @@ const Dashboard: React.FC = () => {
 
   const stats = {
     total: contracts.length,
-    active: contracts.filter((c) => c.status === 'active').length,
-    draft: contracts.filter((c) => c.status === 'draft').length,
-    expired: contracts.filter((c) => c.status === 'expired').length,
+    pending: contracts.filter((c) => ['created', 'approved', 'sent'].includes(c.status)).length,
+    signed: contracts.filter((c) => c.status === 'signed').length,
+    locked: contracts.filter((c) => c.status === 'locked').length,
     totalValue: contracts.reduce((sum, c) => sum + c.value, 0),
   };
 
@@ -59,9 +59,9 @@ const Dashboard: React.FC = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         <StatCard title="Total Contracts" value={stats.total} icon={FileText} color="indigo" />
-        <StatCard title="Active" value={stats.active} icon={CheckCircle} color="green" />
-        <StatCard title="Draft" value={stats.draft} icon={Clock} color="gray" />
-        <StatCard title="Expired" value={stats.expired} icon={XCircle} color="yellow" />
+        <StatCard title="Pending" value={stats.pending} icon={Clock} color="yellow" />
+        <StatCard title="Signed" value={stats.signed} icon={FileSignature} color="green" />
+        <StatCard title="Locked" value={stats.locked} icon={Lock} color="indigo" />
         <StatCard
           title="Total Value"
           value={formatCurrency(stats.totalValue)}

@@ -1,10 +1,11 @@
 import React from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { useNavigate, useParams, Link } from 'react-router-dom';
+import { ArrowLeft, Lock, XCircle } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { updateContract } from '../store/contractSlice';
 import ContractForm from '../components/ContractForm';
 import type { ContractFormData } from '../types/contract';
+import { statusInfo } from '../types/contract';
 
 const EditContract: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -30,6 +31,38 @@ const EditContract: React.FC = () => {
     );
   }
 
+  // Check if contract can be edited
+  const canEdit = contract.status !== 'locked' && contract.status !== 'revoked';
+
+  if (!canEdit) {
+    const isLocked = contract.status === 'locked';
+    return (
+      <div className="flex flex-col items-center justify-center py-16">
+        <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${isLocked ? 'bg-purple-100' : 'bg-red-100'}`}>
+          {isLocked ? (
+            <Lock size={32} className="text-purple-600" />
+          ) : (
+            <XCircle size={32} className="text-red-600" />
+          )}
+        </div>
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          Cannot edit this contract
+        </h2>
+        <p className="text-gray-500 mb-4">
+          {isLocked
+            ? 'This contract is locked and cannot be edited.'
+            : 'This contract has been revoked and cannot be edited.'}
+        </p>
+        <Link
+          to={`/contracts/${contract.id}`}
+          className="px-5 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+        >
+          View Contract Details
+        </Link>
+      </div>
+    );
+  }
+
   const handleSubmit = (data: ContractFormData) => {
     dispatch(updateContract({ id: contract.id, data }));
     navigate(`/contracts/${contract.id}`);
@@ -45,7 +78,17 @@ const EditContract: React.FC = () => {
           <ArrowLeft size={20} />
           Back
         </button>
-        <h1 className="text-3xl font-bold text-gray-900">Edit Contract</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-3xl font-bold text-gray-900">Edit Contract</h1>
+          {(() => {
+            const info = statusInfo[contract.status] || { label: contract.status, color: 'text-gray-700', bgColor: 'bg-gray-100' };
+            return (
+              <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${info.bgColor} ${info.color}`}>
+                {info.label}
+              </span>
+            );
+          })()}
+        </div>
         <p className="text-gray-500">Update the contract details</p>
       </div>
 

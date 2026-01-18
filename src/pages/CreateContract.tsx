@@ -41,7 +41,10 @@ const CreateContract: React.FC = () => {
   }, [stateBlueprint]);
 
   const handleSubmit = (data: ContractFormData) => {
-    dispatch(addContract(data));
+    dispatch(addContract({
+      ...data,
+      blueprintName: selectedBlueprintName || undefined,
+    }));
     navigate('/contracts');
   };
 

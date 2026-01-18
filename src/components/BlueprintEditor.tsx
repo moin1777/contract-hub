@@ -96,7 +96,7 @@ const BlueprintEditor: React.FC<BlueprintEditorProps> = ({
         title: templateTitle,
         description: templateDescription,
         value: templateValue,
-        status: 'draft',
+        status: 'created',
       },
       fields,
     });

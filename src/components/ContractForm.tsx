@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Type, Calendar, CheckSquare, PenTool } from 'lucide-react';
-import type { ContractFormData, ContractStatus, Contract, CustomFieldValue } from '../types/contract';
+import type { ContractFormData, Contract, CustomFieldValue } from '../types/contract';
 import type { BlueprintField } from '../types/blueprint';
 
 interface ContractFormProps {
@@ -29,7 +29,7 @@ const ContractForm: React.FC<ContractFormProps> = ({
     clientName: '',
     title: '',
     description: '',
-    status: 'draft',
+    status: 'created',
     startDate: '',
     endDate: '',
     value: 0,
@@ -45,7 +45,7 @@ const ContractForm: React.FC<ContractFormProps> = ({
         clientName: initialData.clientName || '',
         title: initialData.title || '',
         description: initialData.description || '',
-        status: initialData.status || 'draft',
+        status: initialData.status || 'created',
         startDate: initialData.startDate || '',
         endDate: initialData.endDate || '',
         value: initialData.value || 0,
@@ -145,8 +145,6 @@ const ContractForm: React.FC<ContractFormProps> = ({
     }
   };
 
-  const statuses: ContractStatus[] = ['draft', 'active', 'expired', 'terminated'];
-
   const inputClass = (hasError: boolean) =>
     `w-full px-4 py-2.5 rounded-lg border ${
       hasError
@@ -202,25 +200,6 @@ const ContractForm: React.FC<ContractFormProps> = ({
             rows={3}
             className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none"
           />
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <label htmlFor="status" className="text-sm font-medium text-gray-700">
-            Status
-          </label>
-          <select
-            id="status"
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-          >
-            {statuses.map((status) => (
-              <option key={status} value={status}>
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-              </option>
-            ))}
-          </select>
         </div>
 
         <div className="flex flex-col gap-2">

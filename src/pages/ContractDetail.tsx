@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import { jsPDF } from 'jspdf';
 import { 
   ArrowLeft, 
   Edit, 
@@ -16,6 +17,7 @@ import {
   ChevronRight,
   FileText,
   Layers,
+  Download,
 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { deleteContract, changeContractStatus } from '../store/contractSlice';
@@ -77,6 +79,137 @@ const ContractDetail: React.FC = () => {
     dispatch(changeContractStatus({ id: contract.id, newStatus }));
   };
 
+  const handleDownload = () => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 20;
+    const contentWidth = pageWidth - margin * 2;
+    let y = 20;
+
+    // Helper function to add wrapped text
+    const addWrappedText = (text: string, x: number, startY: number, maxWidth: number, lineHeight: number = 6): number => {
+      const lines = doc.splitTextToSize(text, maxWidth);
+      doc.text(lines, x, startY);
+      return startY + lines.length * lineHeight;
+    };
+
+    // Title
+    doc.setFontSize(22);
+    doc.setTextColor(79, 70, 229); // Indigo color
+    y = addWrappedText(contract.title, margin, y, contentWidth, 8);
+    y += 5;
+
+    // Subtitle
+    doc.setFontSize(11);
+    doc.setTextColor(107, 114, 128); // Gray
+    const subtitle = `Contract for ${contract.clientName}${contract.blueprintName ? ` • Based on ${contract.blueprintName}` : ''}`;
+    y = addWrappedText(subtitle, margin, y, contentWidth);
+    y += 10;
+
+    // Status
+    doc.setFontSize(10);
+    doc.setTextColor(107, 114, 128);
+    doc.text('STATUS', margin, y);
+    y += 6;
+    doc.setFontSize(12);
+    doc.setTextColor(17, 24, 39);
+    doc.text(statusInfo[contract.status]?.label || contract.status, margin, y);
+    y += 12;
+
+    // Draw separator line
+    doc.setDrawColor(229, 231, 235);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 10;
+
+    // Contract Details Grid
+    const col1 = margin;
+    const col2 = pageWidth / 2 + 5;
+
+    // Row 1: Client Name & Contract Value
+    doc.setFontSize(9);
+    doc.setTextColor(107, 114, 128);
+    doc.text('CLIENT NAME', col1, y);
+    doc.text('CONTRACT VALUE', col2, y);
+    y += 5;
+    doc.setFontSize(11);
+    doc.setTextColor(17, 24, 39);
+    doc.text(contract.clientName, col1, y);
+    doc.text(formatCurrency(contract.value), col2, y);
+    y += 12;
+
+    // Row 2: Start Date & End Date
+    doc.setFontSize(9);
+    doc.setTextColor(107, 114, 128);
+    doc.text('START DATE', col1, y);
+    doc.text('END DATE', col2, y);
+    y += 5;
+    doc.setFontSize(11);
+    doc.setTextColor(17, 24, 39);
+    doc.text(formatDate(contract.startDate), col1, y);
+    doc.text(formatDate(contract.endDate), col2, y);
+    y += 15;
+
+    // Description
+    doc.setFontSize(9);
+    doc.setTextColor(107, 114, 128);
+    doc.text('DESCRIPTION', margin, y);
+    y += 6;
+    doc.setFontSize(11);
+    doc.setTextColor(17, 24, 39);
+    y = addWrappedText(contract.description, margin, y, contentWidth);
+    y += 10;
+
+    // Custom Fields
+    if (contract.customFields && contract.customFields.length > 0) {
+      doc.setDrawColor(229, 231, 235);
+      doc.line(margin, y, pageWidth - margin, y);
+      y += 8;
+
+      doc.setFontSize(12);
+      doc.setTextColor(55, 65, 81);
+      doc.text('Custom Fields', margin, y);
+      y += 8;
+
+      contract.customFields.forEach((field) => {
+        // Check if we need a new page
+        if (y > 270) {
+          doc.addPage();
+          y = 20;
+        }
+
+        doc.setFontSize(9);
+        doc.setTextColor(107, 114, 128);
+        doc.text(field.label.toUpperCase(), margin, y);
+        y += 5;
+        doc.setFontSize(11);
+        doc.setTextColor(17, 24, 39);
+        const fieldValue = field.type === 'checkbox' 
+          ? (field.value ? 'Yes' : 'No') 
+          : (field.value?.toString() || '-');
+        y = addWrappedText(fieldValue, margin, y, contentWidth);
+        y += 6;
+      });
+    }
+
+    // Footer
+    y = Math.max(y + 15, 250);
+    if (y > 270) {
+      doc.addPage();
+      y = 250;
+    }
+    doc.setDrawColor(229, 231, 235);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 8;
+    doc.setFontSize(8);
+    doc.setTextColor(156, 163, 175);
+    doc.text(`Contract ID: ${contract.id}`, pageWidth / 2, y, { align: 'center' });
+    y += 5;
+    doc.text(`Created: ${formatDate(contract.createdAt)} • Last Updated: ${formatDate(contract.updatedAt)}`, pageWidth / 2, y, { align: 'center' });
+
+    // Save the PDF
+    doc.save(`${contract.title.replace(/[^a-z0-9]/gi, '_')}_contract.pdf`);
+  };
+
   const allowedTransitions = statusTransitions[contract.status];
   const canEdit = contract.status !== 'locked' && contract.status !== 'revoked';
   const isRevoked = contract.status === 'revoked';
@@ -111,6 +244,13 @@ const ContractDetail: React.FC = () => {
           Back
         </button>
         <div className="flex gap-3">
+          <button
+            onClick={handleDownload}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+          >
+            <Download size={18} />
+            Download
+          </button>
           {canEdit && (
             <Link
               to={`/contracts/${contract.id}/edit`}

@@ -57,13 +57,6 @@ const CreateContract: React.FC = () => {
     setStep('form');
   };
 
-  const handleSkipBlueprint = () => {
-    setInitialData(undefined);
-    setSelectedBlueprintName(null);
-    setBlueprintFields([]);
-    setStep('form');
-  };
-
   const handleBackToBlueprints = () => {
     setStep('blueprint');
     setInitialData(undefined);
@@ -98,7 +91,6 @@ const CreateContract: React.FC = () => {
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <BlueprintSelector 
             onSelect={handleBlueprintSelect} 
-            onSkip={handleSkipBlueprint}
           />
         </div>
       ) : (

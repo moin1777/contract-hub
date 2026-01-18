@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Briefcase, 
   Users, 
@@ -25,7 +25,6 @@ import BlueprintEditor from './BlueprintEditor';
 
 interface BlueprintSelectorProps {
   onSelect: (blueprint: Blueprint | null) => void;
-  onSkip: () => void;
 }
 
 const iconMap: Record<string, React.FC<{ size?: number }>> = {
@@ -47,12 +46,37 @@ const fieldTypeIcons: Record<string, React.FC<{ size?: number; className?: strin
   signature: PenTool,
 };
 
-const BlueprintSelector: React.FC<BlueprintSelectorProps> = ({ onSelect, onSkip }) => {
+const BlueprintSelector: React.FC<BlueprintSelectorProps> = ({ onSelect }) => {
   const dispatch = useAppDispatch();
   const blueprints = useAppSelector((state) => state.blueprints.blueprints);
   const [selectedCategory, setSelectedCategory] = useState<BlueprintCategory | 'all'>('all');
   const [selectedBlueprint, setSelectedBlueprint] = useState<Blueprint | null>(null);
   const [showEditor, setShowEditor] = useState(false);
+  const [isCreatingNew, setIsCreatingNew] = useState(false);
+  const [pendingBlueprintName, setPendingBlueprintName] = useState<string | null>(null);
+
+  // Sync selectedBlueprint with the Redux store when blueprints change
+  useEffect(() => {
+    if (selectedBlueprint) {
+      const updated = blueprints.find((bp) => bp.id === selectedBlueprint.id);
+      if (updated) {
+        setSelectedBlueprint(updated);
+      }
+    }
+  }, [blueprints, selectedBlueprint?.id]);
+
+  // Handle finding the newly created blueprint after adding
+  useEffect(() => {
+    if (pendingBlueprintName) {
+      const newBlueprint = blueprints.find(
+        (bp) => bp.isCustom && bp.name === pendingBlueprintName
+      );
+      if (newBlueprint) {
+        setSelectedBlueprint(newBlueprint);
+        setPendingBlueprintName(null);
+      }
+    }
+  }, [blueprints, pendingBlueprintName]);
 
   const filteredBlueprints = selectedCategory === 'all'
     ? blueprints
@@ -69,30 +93,37 @@ const BlueprintSelector: React.FC<BlueprintSelectorProps> = ({ onSelect, onSkip 
   };
 
   const handleSaveBlueprint = (blueprintData: Omit<Blueprint, 'id' | 'createdAt' | 'updatedAt' | 'isCustom'>) => {
-    if (selectedBlueprint) {
+    if (isCreatingNew) {
+      // Creating a new blueprint from scratch
+      dispatch(addBlueprint(blueprintData));
+      setPendingBlueprintName(blueprintData.name);
+    } else if (selectedBlueprint) {
       // Update existing blueprint or create as custom copy
       if (selectedBlueprint.isCustom) {
         dispatch(updateBlueprint({
           id: selectedBlueprint.id,
           updates: blueprintData,
         }));
-        // Update selected blueprint with new data
-        setSelectedBlueprint({
-          ...selectedBlueprint,
-          ...blueprintData,
-        });
+        // The useEffect above will sync the selectedBlueprint with the updated store
       } else {
         // Create a custom copy of the default blueprint
         dispatch(addBlueprint(blueprintData));
-        // Find the newly created blueprint (it will be the last custom one)
-        // We'll update the selection after the state updates
+        // Set pending name to find the new blueprint after store updates
+        setPendingBlueprintName(blueprintData.name);
       }
     }
     setShowEditor(false);
+    setIsCreatingNew(false);
   };
 
   const handleCloseEditor = () => {
     setShowEditor(false);
+    setIsCreatingNew(false);
+  };
+
+  const handleStartFromScratch = () => {
+    setIsCreatingNew(true);
+    setShowEditor(true);
   };
 
   const getIcon = (iconName: string) => {
@@ -111,7 +142,7 @@ const BlueprintSelector: React.FC<BlueprintSelectorProps> = ({ onSelect, onSkip 
         </div>
         <button
           className="inline-flex items-center gap-2 px-4 py-2 text-indigo-600 font-medium hover:bg-indigo-50 rounded-lg transition-colors"
-          onClick={onSkip}
+          onClick={handleStartFromScratch}
         >
           Start from scratch
           <ArrowRight size={16} />
@@ -253,9 +284,9 @@ const BlueprintSelector: React.FC<BlueprintSelectorProps> = ({ onSelect, onSkip 
       )}
 
       {/* Blueprint Editor Modal */}
-      {showEditor && selectedBlueprint && (
+      {showEditor && (isCreatingNew || selectedBlueprint) && (
         <BlueprintEditor
-          blueprint={selectedBlueprint}
+          blueprint={isCreatingNew ? null : selectedBlueprint}
           onSave={handleSaveBlueprint}
           onCancel={handleCloseEditor}
         />

@@ -32,6 +32,7 @@ const ContractList: React.FC = () => {
   );
   const [viewMode, setViewMode] = useState<ViewMode>('table');
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [menuPosition, setMenuPosition] = useState<{ top: number; right: number }>({ top: 0, right: 0 });
 
   const filteredContracts = contracts.filter((contract) => {
     const matchesSearch =
@@ -265,88 +266,29 @@ const ContractList: React.FC = () => {
                             )}
                             
                             {/* More actions dropdown */}
-                            <div className="relative">
+                            <div className="relative inline-block">
                               <button
-                                onClick={() => setOpenMenuId(openMenuId === contract.id ? null : contract.id)}
-                                className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (openMenuId === contract.id) {
+                                    setOpenMenuId(null);
+                                  } else {
+                                    const rect = e.currentTarget.getBoundingClientRect();
+                                    setMenuPosition({
+                                      top: rect.bottom + 8,
+                                      right: window.innerWidth - rect.right
+                                    });
+                                    setOpenMenuId(contract.id);
+                                  }
+                                }}
+                                className={`p-2 rounded-lg border transition-all ${
+                                  openMenuId === contract.id 
+                                    ? 'bg-gray-100 border-gray-300' 
+                                    : 'border-gray-200 hover:bg-gray-50 hover:border-gray-300'
+                                }`}
                               >
-                                <MoreVertical size={16} className="text-gray-500" />
+                                <MoreVertical size={16} className="text-gray-600" />
                               </button>
-                              {openMenuId === contract.id && (
-                                <>
-                                  <div
-                                    className="fixed inset-0 z-10"
-                                    onClick={() => setOpenMenuId(null)}
-                                  />
-                                  <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-20 overflow-hidden">
-                                    <div className="px-3 py-2 border-b border-gray-100">
-                                      <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Actions</p>
-                                    </div>
-                                    <button
-                                      onClick={() => {
-                                        navigate(`/contracts/${contract.id}`);
-                                        setOpenMenuId(null);
-                                      }}
-                                      className="w-full px-4 py-2.5 text-left text-sm hover:bg-gray-50 flex items-center gap-3 text-gray-700 transition-colors"
-                                    >
-                                      <Eye size={16} className="text-gray-400" />
-                                      View Details
-                                    </button>
-                                    {canEdit(contract) && (
-                                      <button
-                                        onClick={() => {
-                                          navigate(`/contracts/${contract.id}/edit`);
-                                          setOpenMenuId(null);
-                                        }}
-                                        className="w-full px-4 py-2.5 text-left text-sm hover:bg-gray-50 flex items-center gap-3 text-gray-700 transition-colors"
-                                      >
-                                        <Edit2 size={16} className="text-gray-400" />
-                                        Edit Contract
-                                      </button>
-                                    )}
-                                    
-                                    {/* Mobile-only status actions */}
-                                    {nextActions.filter(s => s !== 'revoked').length > 0 && (
-                                      <div className="lg:hidden border-t border-gray-100 mt-1 pt-1">
-                                        <div className="px-3 py-2">
-                                          <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Change Status</p>
-                                        </div>
-                                        {nextActions.filter(s => s !== 'revoked').map((status) => (
-                                          <button
-                                            key={status}
-                                            onClick={() => handleStatusChange(contract.id, status)}
-                                            className="w-full px-4 py-2.5 text-left text-sm hover:bg-indigo-50 flex items-center gap-3 text-indigo-600 transition-colors"
-                                          >
-                                            {getActionIcon(status)}
-                                            Mark as {statusInfo[status]?.label || status}
-                                          </button>
-                                        ))}
-                                      </div>
-                                    )}
-                                    
-                                    {(nextActions.includes('revoked') || true) && (
-                                      <div className="border-t border-gray-100 mt-1 pt-1">
-                                        {nextActions.includes('revoked') && (
-                                          <button
-                                            onClick={() => handleStatusChange(contract.id, 'revoked')}
-                                            className="w-full px-4 py-2.5 text-left text-sm hover:bg-red-50 flex items-center gap-3 text-red-600 transition-colors"
-                                          >
-                                            <XCircle size={16} />
-                                            Revoke Contract
-                                          </button>
-                                        )}
-                                        <button
-                                          onClick={() => handleDelete(contract.id)}
-                                          className="w-full px-4 py-2.5 text-left text-sm hover:bg-red-50 flex items-center gap-3 text-red-600 transition-colors"
-                                        >
-                                          <Trash2 size={16} />
-                                          Delete Contract
-                                        </button>
-                                      </div>
-                                    )}
-                                  </div>
-                                </>
-                              )}
                             </div>
                           </div>
                         </td>
@@ -449,6 +391,129 @@ const ContractList: React.FC = () => {
           actionLink="/contracts/new"
         />
       )}
+
+      {/* Floating Action Menu */}
+      {openMenuId && (() => {
+        const contract = contracts.find(c => c.id === openMenuId);
+        if (!contract) return null;
+        const nextActions = getNextActions(contract);
+        
+        return (
+          <>
+            <div
+              className="fixed inset-0 z-40"
+              onClick={() => setOpenMenuId(null)}
+            />
+            <div 
+              className="fixed z-50 w-56 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col"
+              style={{
+                top: `${Math.min(menuPosition.top, window.innerHeight - 400)}px`,
+                right: `${menuPosition.right}px`,
+                maxHeight: 'calc(100vh - 100px)'
+              }}
+            >
+              {/* Header */}
+              <div className="px-4 py-3 border-b border-gray-100 bg-gray-50 shrink-0">
+                <p className="font-medium text-gray-900 text-sm truncate">{contract.title}</p>
+                <p className="text-xs text-gray-500 mt-0.5">Manage contract</p>
+              </div>
+
+              {/* Scrollable Content */}
+              <div className="overflow-y-auto flex-1">
+                {/* Primary Actions */}
+                <div className="py-2">
+                  <button
+                    onClick={() => {
+                      navigate(`/contracts/${contract.id}`);
+                      setOpenMenuId(null);
+                    }}
+                    className="w-full px-4 py-2.5 text-left text-sm hover:bg-gray-50 flex items-center gap-3 text-gray-700 transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                      <Eye size={16} className="text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium">View Details</p>
+                      <p className="text-xs text-gray-400">See full contract</p>
+                    </div>
+                  </button>
+                  {canEdit(contract) && (
+                    <button
+                      onClick={() => {
+                        navigate(`/contracts/${contract.id}/edit`);
+                        setOpenMenuId(null);
+                      }}
+                      className="w-full px-4 py-2.5 text-left text-sm hover:bg-gray-50 flex items-center gap-3 text-gray-700 transition-colors"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
+                        <Edit2 size={16} className="text-amber-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium">Edit Contract</p>
+                        <p className="text-xs text-gray-400">Modify details</p>
+                      </div>
+                    </button>
+                  )}
+                </div>
+
+                {/* Status Actions */}
+                {nextActions.filter(s => s !== 'revoked').length > 0 && (
+                  <div className="border-t border-gray-100 py-2">
+                    <div className="px-4 py-2">
+                      <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Change Status</p>
+                    </div>
+                    {nextActions.filter(s => s !== 'revoked').map((status) => (
+                      <button
+                        key={status}
+                        onClick={() => handleStatusChange(contract.id, status)}
+                        className="w-full px-4 py-2.5 text-left text-sm hover:bg-indigo-50 flex items-center gap-3 text-indigo-600 transition-colors"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center">
+                          {getActionIcon(status)}
+                        </div>
+                        <span className="font-medium">Mark as {statusInfo[status]?.label || status}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Danger Zone */}
+                <div className="border-t border-gray-100 py-2 bg-red-50/30">
+                  <div className="px-4 py-2">
+                    <p className="text-xs font-medium text-red-400 uppercase tracking-wide">Danger Zone</p>
+                  </div>
+                  {nextActions.includes('revoked') && (
+                    <button
+                      onClick={() => handleStatusChange(contract.id, 'revoked')}
+                      className="w-full px-4 py-2.5 text-left text-sm hover:bg-red-100 flex items-center gap-3 text-red-600 transition-colors"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
+                        <XCircle size={16} className="text-red-500" />
+                      </div>
+                      <div>
+                        <p className="font-medium">Revoke Contract</p>
+                        <p className="text-xs text-red-400">Cancel this contract</p>
+                      </div>
+                    </button>
+                  )}
+                  <button
+                    onClick={() => handleDelete(contract.id)}
+                    className="w-full px-4 py-2.5 text-left text-sm hover:bg-red-100 flex items-center gap-3 text-red-600 transition-colors mb-2"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
+                      <Trash2 size={16} className="text-red-500" />
+                    </div>
+                    <div>
+                      <p className="font-medium">Delete Contract</p>
+                      <p className="text-xs text-red-400">Remove permanently</p>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        );
+      })()}
     </div>
   );
 };

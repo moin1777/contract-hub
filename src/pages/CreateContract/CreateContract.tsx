@@ -7,7 +7,6 @@ import ContractForm from '../../components/ContractForm';
 import BlueprintSelector from '../../components/BlueprintSelector';
 import type { ContractFormData } from '../../types/contract';
 import type { Blueprint } from '../../types/blueprint';
-import './CreateContract.css';
 
 type CreateStep = 'blueprint' | 'form';
 
@@ -64,19 +63,19 @@ const CreateContract: React.FC = () => {
   };
 
   return (
-    <div className="create-contract-page">
-      <div className="page-header">
+    <div className="space-y-6">
+      <div className="space-y-2">
         <button 
           onClick={step === 'form' ? handleBackToBlueprints : () => navigate(-1)} 
-          className="back-button"
+          className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-700 transition-colors"
         >
           <ArrowLeft size={20} />
           {step === 'form' ? 'Back to Blueprints' : 'Back'}
         </button>
-        <h1 className="page-title">
+        <h1 className="text-3xl font-bold text-gray-900">
           {step === 'blueprint' ? 'Create New Contract' : 'Contract Details'}
         </h1>
-        <p className="page-subtitle">
+        <p className="text-gray-500">
           {step === 'blueprint' 
             ? 'Select a template to get started quickly'
             : selectedBlueprintName 
@@ -87,16 +86,20 @@ const CreateContract: React.FC = () => {
       </div>
 
       {step === 'blueprint' ? (
-        <BlueprintSelector 
-          onSelect={handleBlueprintSelect} 
-          onSkip={handleSkipBlueprint}
-        />
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <BlueprintSelector 
+            onSelect={handleBlueprintSelect} 
+            onSkip={handleSkipBlueprint}
+          />
+        </div>
       ) : (
-        <ContractForm
-          initialData={initialData}
-          onSubmit={handleSubmit}
-          onCancel={() => navigate(-1)}
-        />
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <ContractForm
+            initialData={initialData}
+            onSubmit={handleSubmit}
+            onCancel={() => navigate(-1)}
+          />
+        </div>
       )}
     </div>
   );

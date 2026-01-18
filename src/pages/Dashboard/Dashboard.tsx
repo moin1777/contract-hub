@@ -7,7 +7,6 @@ import ContractCard from '../../components/ContractCard';
 import EmptyState from '../../components/EmptyState';
 import { useAppDispatch } from '../../store/hooks';
 import { deleteContract } from '../../store/contractSlice';
-import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -41,21 +40,24 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="dashboard">
-      <div className="dashboard-header">
+    <div className="space-y-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="dashboard-title">Dashboard</h1>
-          <p className="dashboard-subtitle">
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-500 mt-1">
             Manage and track all your contracts in one place
           </p>
         </div>
-        <Link to="/contracts/new" className="btn-create">
+        <Link
+          to="/contracts/new"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+        >
           <Plus size={20} />
           New Contract
         </Link>
       </div>
 
-      <div className="stats-grid">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         <StatCard title="Total Contracts" value={stats.total} icon={FileText} color="indigo" />
         <StatCard title="Active" value={stats.active} icon={CheckCircle} color="green" />
         <StatCard title="Draft" value={stats.draft} icon={Clock} color="gray" />
@@ -68,18 +70,18 @@ const Dashboard: React.FC = () => {
         />
       </div>
 
-      <section className="recent-section">
-        <div className="section-header">
-          <h2 className="section-title">Recent Contracts</h2>
+      <section>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-gray-900">Recent Contracts</h2>
           {contracts.length > 0 && (
-            <Link to="/contracts" className="view-all">
+            <Link to="/contracts" className="text-indigo-600 font-medium hover:text-indigo-700 transition-colors">
               View all
             </Link>
           )}
         </div>
 
         {recentContracts.length > 0 ? (
-          <div className="contracts-grid">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {recentContracts.map((contract) => (
               <ContractCard
                 key={contract.id}

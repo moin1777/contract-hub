@@ -1,43 +1,33 @@
-* {
-  box-sizing: border-box;
-}
+@import "tailwindcss";
 
-:root {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-  color-scheme: light;
-  color: #111827;
-  background-color: #f9fafb;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
 
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-}
+  :root {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  }
 
-#root {
-  min-height: 100vh;
-}
+  body {
+    @apply m-0 min-w-[320px] min-h-screen bg-gray-50 text-gray-900 antialiased;
+  }
 
-a {
-  text-decoration: none;
-  color: inherit;
-}
+  #root {
+    @apply min-h-screen;
+  }
 
-button {
-  font-family: inherit;
-}
+  a {
+    @apply no-underline text-inherit;
+  }
 
-input,
-textarea,
-select {
-  font-family: inherit;
+  button {
+    font: inherit;
+  }
+
+  input, textarea, select {
+    font: inherit;
+  }
 }
 
 /* Custom scrollbar */
@@ -51,10 +41,9 @@ select {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
+  @apply bg-gray-300 rounded;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
+  @apply bg-gray-400;
 }

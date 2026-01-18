@@ -6,7 +6,6 @@ import { deleteContract, setSearchQuery, setFilterStatus } from '../../store/con
 import ContractCard from '../../components/ContractCard';
 import SearchFilter from '../../components/SearchFilter';
 import EmptyState from '../../components/EmptyState';
-import './ContractList.css';
 
 const ContractList: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -37,15 +36,18 @@ const ContractList: React.FC = () => {
   };
 
   return (
-    <div className="contract-list-page">
-      <div className="page-header">
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="page-title">Contracts</h1>
-          <p className="page-subtitle">
+          <h1 className="text-3xl font-bold text-gray-900">Contracts</h1>
+          <p className="text-gray-500 mt-1">
             {contracts.length} contract{contracts.length !== 1 ? 's' : ''} total
           </p>
         </div>
-        <Link to="/contracts/new" className="btn-create">
+        <Link
+          to="/contracts/new"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+        >
           <Plus size={20} />
           New Contract
         </Link>
@@ -59,7 +61,7 @@ const ContractList: React.FC = () => {
       />
 
       {sortedContracts.length > 0 ? (
-        <div className="contracts-grid">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {sortedContracts.map((contract) => (
             <ContractCard
               key={contract.id}

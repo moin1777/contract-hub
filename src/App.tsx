@@ -9,34 +9,43 @@ import ContractDetail from './pages/ContractDetail';
 import CreateContract from './pages/CreateContract';
 import EditContract from './pages/EditContract';
 import Blueprints from './pages/Blueprints';
-import './App.css';
 
 const MobileNav: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
   const location = useLocation();
 
   if (!isOpen) return null;
 
+  const linkClass = (isActive: boolean) =>
+    `block px-4 py-3 text-base font-medium border-b border-gray-100 transition-colors ${
+      isActive
+        ? 'bg-indigo-50 text-indigo-600'
+        : 'text-gray-600 hover:bg-gray-50'
+    }`;
+
   return (
     <>
-      <div className="mobile-overlay" onClick={onClose} />
-      <nav className="mobile-nav">
+      <div
+        className="fixed inset-0 bg-black/50 z-40 md:hidden"
+        onClick={onClose}
+      />
+      <nav className="fixed top-16 left-0 right-0 bg-white border-b border-gray-200 z-40 md:hidden">
         <Link
           to="/"
-          className={`mobile-nav-link ${location.pathname === '/' ? 'active' : ''}`}
+          className={linkClass(location.pathname === '/')}
           onClick={onClose}
         >
           Dashboard
         </Link>
         <Link
           to="/contracts"
-          className={`mobile-nav-link ${location.pathname.startsWith('/contracts') ? 'active' : ''}`}
+          className={linkClass(location.pathname.startsWith('/contracts'))}
           onClick={onClose}
         >
           Contracts
         </Link>
         <Link
           to="/blueprints"
-          className={`mobile-nav-link ${location.pathname === '/blueprints' ? 'active' : ''}`}
+          className={linkClass(location.pathname === '/blueprints')}
           onClick={onClose}
         >
           Blueprints
@@ -50,13 +59,13 @@ const AppContent: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="app">
+    <div className="min-h-screen bg-gray-50">
       <Header
         onMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
         isMenuOpen={mobileMenuOpen}
       />
       <MobileNav isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
-      <main className="main-content">
+      <main className="max-w-7xl mx-auto px-6 py-8">
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/contracts" element={<ContractList />} />

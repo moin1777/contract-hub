@@ -3,7 +3,6 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Edit, Trash2, Calendar, DollarSign, User, Clock } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { deleteContract } from '../../store/contractSlice';
-import './ContractDetail.css';
 
 const ContractDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,14 +15,15 @@ const ContractDetail: React.FC = () => {
 
   if (!contract) {
     return (
-      <div className="contract-detail-page">
-        <div className="not-found">
-          <h2>Contract not found</h2>
-          <p>The contract you're looking for doesn't exist.</p>
-          <Link to="/contracts" className="btn-back">
-            Back to Contracts
-          </Link>
-        </div>
+      <div className="flex flex-col items-center justify-center py-16">
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">Contract not found</h2>
+        <p className="text-gray-500 mb-4">The contract you're looking for doesn't exist.</p>
+        <Link
+          to="/contracts"
+          className="px-5 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+        >
+          Back to Contracts
+        </Link>
       </div>
     );
   }
@@ -48,12 +48,12 @@ const ContractDetail: React.FC = () => {
 
   const getStatusClass = (status: string) => {
     const classes: Record<string, string> = {
-      active: 'status-active',
-      draft: 'status-draft',
-      expired: 'status-expired',
-      terminated: 'status-terminated',
+      active: 'bg-emerald-50 text-emerald-700',
+      draft: 'bg-gray-100 text-gray-600',
+      expired: 'bg-amber-50 text-amber-700',
+      terminated: 'bg-red-50 text-red-700',
     };
-    return classes[status] || 'status-draft';
+    return classes[status] || 'bg-gray-100 text-gray-600';
   };
 
   const handleDelete = () => {
@@ -64,95 +64,102 @@ const ContractDetail: React.FC = () => {
   };
 
   return (
-    <div className="contract-detail-page">
-      <div className="detail-header">
-        <button onClick={() => navigate(-1)} className="back-button">
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <button
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-700 transition-colors"
+        >
           <ArrowLeft size={20} />
           Back
         </button>
-        <div className="header-actions">
-          <Link to={`/contracts/${contract.id}/edit`} className="btn-edit">
+        <div className="flex gap-3">
+          <Link
+            to={`/contracts/${contract.id}/edit`}
+            className="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+          >
             <Edit size={18} />
             Edit
           </Link>
-          <button onClick={handleDelete} className="btn-delete">
+          <button
+            onClick={handleDelete}
+            className="inline-flex items-center gap-2 px-4 py-2 border border-red-200 rounded-lg text-red-600 font-medium hover:bg-red-50 transition-colors"
+          >
             <Trash2 size={18} />
             Delete
           </button>
         </div>
       </div>
 
-      <div className="detail-content">
-        <div className="detail-main">
-          <div className="title-section">
-            <span className={`status-badge ${getStatusClass(contract.status)}`}>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide mb-4 ${getStatusClass(contract.status)}`}>
               {contract.status}
             </span>
-            <h1 className="contract-title">{contract.title}</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{contract.title}</h1>
           </div>
 
           {contract.description && (
-            <div className="description-section">
-              <h3>Description</h3>
-              <p>{contract.description}</p>
+            <div className="bg-white rounded-xl border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Description</h3>
+              <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">{contract.description}</p>
             </div>
           )}
         </div>
 
-        <div className="detail-sidebar">
-          <div className="info-card">
-            <h3>Contract Details</h3>
-            <div className="info-list">
-              <div className="info-item">
-                <div className="info-icon">
-                  <User size={18} />
-                </div>
-                <div className="info-content">
-                  <span className="info-label">Client</span>
-                  <span className="info-value">{contract.clientName}</span>
-                </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-6 h-fit">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Contract Details</h3>
+          <div className="space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                <User size={18} className="text-gray-500" />
               </div>
-
-              <div className="info-item">
-                <div className="info-icon">
-                  <DollarSign size={18} />
-                </div>
-                <div className="info-content">
-                  <span className="info-label">Value</span>
-                  <span className="info-value">{formatCurrency(contract.value)}</span>
-                </div>
+              <div>
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Client</span>
+                <p className="text-gray-900 font-medium">{contract.clientName}</p>
               </div>
+            </div>
 
-              <div className="info-item">
-                <div className="info-icon">
-                  <Calendar size={18} />
-                </div>
-                <div className="info-content">
-                  <span className="info-label">Start Date</span>
-                  <span className="info-value">{formatDate(contract.startDate)}</span>
-                </div>
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                <DollarSign size={18} className="text-gray-500" />
               </div>
-
-              <div className="info-item">
-                <div className="info-icon">
-                  <Calendar size={18} />
-                </div>
-                <div className="info-content">
-                  <span className="info-label">End Date</span>
-                  <span className="info-value">{formatDate(contract.endDate)}</span>
-                </div>
+              <div>
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Value</span>
+                <p className="text-gray-900 font-medium">{formatCurrency(contract.value)}</p>
               </div>
+            </div>
 
-              <div className="info-item">
-                <div className="info-icon">
-                  <Clock size={18} />
-                </div>
-                <div className="info-content">
-                  <span className="info-label">Last Updated</span>
-                  <span className="info-value">
-                    {new Date(contract.updatedAt).toLocaleString()}
-                  </span>
-                </div>
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                <Calendar size={18} className="text-gray-500" />
+              </div>
+              <div>
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Start Date</span>
+                <p className="text-gray-900 font-medium">{formatDate(contract.startDate)}</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                <Calendar size={18} className="text-gray-500" />
+              </div>
+              <div>
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">End Date</span>
+                <p className="text-gray-900 font-medium">{formatDate(contract.endDate)}</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                <Clock size={18} className="text-gray-500" />
+              </div>
+              <div>
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Last Updated</span>
+                <p className="text-gray-900 font-medium">
+                  {new Date(contract.updatedAt).toLocaleString()}
+                </p>
               </div>
             </div>
           </div>

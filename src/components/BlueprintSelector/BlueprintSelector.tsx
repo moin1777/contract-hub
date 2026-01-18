@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import type { Blueprint, BlueprintCategory } from '../../types/blueprint';
 import { defaultBlueprints, blueprintCategories } from '../../types/blueprint';
-import './BlueprintSelector.css';
 
 interface BlueprintSelectorProps {
   onSelect: (blueprint: Blueprint | null) => void;
@@ -53,23 +52,30 @@ const BlueprintSelector: React.FC<BlueprintSelectorProps> = ({ onSelect, onSkip 
   };
 
   return (
-    <div className="blueprint-selector">
-      <div className="blueprint-header">
-        <div className="blueprint-header-content">
-          <h2 className="blueprint-title">Choose a Blueprint</h2>
-          <p className="blueprint-subtitle">
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Choose a Blueprint</h2>
+          <p className="text-gray-500 mt-1">
             Start with a pre-built template to create your contract faster
           </p>
         </div>
-        <button className="skip-button" onClick={onSkip}>
+        <button
+          className="inline-flex items-center gap-2 px-4 py-2 text-indigo-600 font-medium hover:bg-indigo-50 rounded-lg transition-colors"
+          onClick={onSkip}
+        >
           Start from scratch
           <ArrowRight size={16} />
         </button>
       </div>
 
-      <div className="category-tabs">
+      <div className="flex flex-wrap gap-2">
         <button
-          className={`category-tab ${selectedCategory === 'all' ? 'active' : ''}`}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+            selectedCategory === 'all'
+              ? 'bg-indigo-600 text-white'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          }`}
           onClick={() => setSelectedCategory('all')}
         >
           All
@@ -77,7 +83,11 @@ const BlueprintSelector: React.FC<BlueprintSelectorProps> = ({ onSelect, onSkip 
         {blueprintCategories.map((cat) => (
           <button
             key={cat.value}
-            className={`category-tab ${selectedCategory === cat.value ? 'active' : ''}`}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              selectedCategory === cat.value
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
             onClick={() => setSelectedCategory(cat.value)}
           >
             {cat.label}
@@ -85,7 +95,7 @@ const BlueprintSelector: React.FC<BlueprintSelectorProps> = ({ onSelect, onSkip 
         ))}
       </div>
 
-      <div className="blueprints-grid">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredBlueprints.map((blueprint) => {
           const Icon = getIcon(blueprint.icon);
           const isSelected = selectedBlueprint?.id === blueprint.id;
@@ -93,21 +103,28 @@ const BlueprintSelector: React.FC<BlueprintSelectorProps> = ({ onSelect, onSkip 
           return (
             <div
               key={blueprint.id}
-              className={`blueprint-card ${isSelected ? 'selected' : ''}`}
+              className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                isSelected
+                  ? 'border-indigo-500 bg-indigo-50'
+                  : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md'
+              }`}
               onClick={() => setSelectedBlueprint(isSelected ? null : blueprint)}
             >
               <div 
-                className="blueprint-icon"
+                className="w-12 h-12 rounded-xl flex items-center justify-center mb-3"
                 style={{ backgroundColor: `${blueprint.color}15`, color: blueprint.color }}
               >
                 <Icon size={24} />
               </div>
-              <div className="blueprint-info">
-                <h3 className="blueprint-name">{blueprint.name}</h3>
-                <p className="blueprint-description">{blueprint.description}</p>
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-1">{blueprint.name}</h3>
+                <p className="text-sm text-gray-500 line-clamp-2">{blueprint.description}</p>
               </div>
               {isSelected && (
-                <div className="selected-indicator" style={{ backgroundColor: blueprint.color }}>
+                <div
+                  className="absolute top-3 right-3 w-6 h-6 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: blueprint.color }}
+                >
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                     <path d="M2 6L5 9L10 3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
@@ -119,32 +136,38 @@ const BlueprintSelector: React.FC<BlueprintSelectorProps> = ({ onSelect, onSkip 
       </div>
 
       {selectedBlueprint && (
-        <div className="blueprint-preview">
-          <div className="preview-header">
-            <h3>Template Preview</h3>
-            <button className="close-preview" onClick={() => setSelectedBlueprint(null)}>
+        <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-gray-900">Template Preview</h3>
+            <button
+              className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition-colors"
+              onClick={() => setSelectedBlueprint(null)}
+            >
               <X size={18} />
             </button>
           </div>
-          <div className="preview-content">
-            <div className="preview-field">
-              <span className="preview-label">Title</span>
-              <span className="preview-value">{selectedBlueprint.template.title}</span>
+          <div className="space-y-3 mb-4">
+            <div>
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Title</span>
+              <p className="text-gray-900">{selectedBlueprint.template.title}</p>
             </div>
-            <div className="preview-field">
-              <span className="preview-label">Description</span>
-              <span className="preview-value">{selectedBlueprint.template.description}</span>
+            <div>
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Description</span>
+              <p className="text-gray-900">{selectedBlueprint.template.description}</p>
             </div>
             {selectedBlueprint.template.value !== undefined && selectedBlueprint.template.value > 0 && (
-              <div className="preview-field">
-                <span className="preview-label">Default Value</span>
-                <span className="preview-value">
+              <div>
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Default Value</span>
+                <p className="text-gray-900">
                   ${selectedBlueprint.template.value.toLocaleString()}
-                </span>
+                </p>
               </div>
             )}
           </div>
-          <button className="use-blueprint-btn" onClick={handleUseBlueprint}>
+          <button
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+            onClick={handleUseBlueprint}
+          >
             Use this Blueprint
             <ArrowRight size={18} />
           </button>

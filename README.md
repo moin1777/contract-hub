@@ -33,6 +33,9 @@ This platform brings everything together in one place with a clean, intuitive in
 *Dashboard with contract overview and quick stats*
 
 ![Contract Detail](./screenshots/contract_detail.png)
+*Contract page with All necessary details*
+
+![Contract Detail](./screenshots/contract_detail_2.png)
 *Contract detail page with lifecycle tracking*
 
 ![Blueprint Manager](./screenshots/blueprint_manager.png)
@@ -533,7 +536,7 @@ Future enhancements planned:
 
 Having issues? Found a bug? Have a feature request?
 
-- 📧 Email: your.email@example.com
+- 📧 Email: malekmoin.work@gmail.com
 - 🐛 Issues: [GitHub Issues](https://github.com/moin1777/contract-hub/issues)
 - 💬 Discussions: [GitHub Discussions](https://github.com/moin1777/contract-hub/discussions)
 

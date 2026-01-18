@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Menu, X } from 'lucide-react';
+import { FileText, Menu, X, Layers } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import './Header.css';
 
@@ -31,6 +31,13 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen }) => {
             className={`nav-link ${location.pathname.startsWith('/contracts') ? 'active' : ''}`}
           >
             Contracts
+          </Link>
+          <Link
+            to="/blueprints"
+            className={`nav-link ${location.pathname === '/blueprints' ? 'active' : ''}`}
+          >
+            <Layers size={16} />
+            Blueprints
           </Link>
         </nav>
 

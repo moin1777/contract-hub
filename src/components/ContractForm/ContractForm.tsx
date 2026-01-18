@@ -3,7 +3,7 @@ import type { ContractFormData, ContractStatus, Contract } from '../../types/con
 import './ContractForm.css';
 
 interface ContractFormProps {
-  initialData?: Contract;
+  initialData?: Contract | Partial<ContractFormData>;
   onSubmit: (data: ContractFormData) => void;
   onCancel: () => void;
   isEditing?: boolean;
@@ -30,13 +30,13 @@ const ContractForm: React.FC<ContractFormProps> = ({
   useEffect(() => {
     if (initialData) {
       setFormData({
-        clientName: initialData.clientName,
-        title: initialData.title,
-        description: initialData.description,
-        status: initialData.status,
-        startDate: initialData.startDate,
-        endDate: initialData.endDate,
-        value: initialData.value,
+        clientName: initialData.clientName || '',
+        title: initialData.title || '',
+        description: initialData.description || '',
+        status: initialData.status || 'draft',
+        startDate: initialData.startDate || '',
+        endDate: initialData.endDate || '',
+        value: initialData.value || 0,
       });
     }
   }, [initialData]);

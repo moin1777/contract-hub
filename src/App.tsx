@@ -8,6 +8,7 @@ import ContractList from './pages/ContractList';
 import ContractDetail from './pages/ContractDetail';
 import CreateContract from './pages/CreateContract';
 import EditContract from './pages/EditContract';
+import Blueprints from './pages/Blueprints';
 import './App.css';
 
 const MobileNav: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
@@ -33,6 +34,13 @@ const MobileNav: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen,
         >
           Contracts
         </Link>
+        <Link
+          to="/blueprints"
+          className={`mobile-nav-link ${location.pathname === '/blueprints' ? 'active' : ''}`}
+          onClick={onClose}
+        >
+          Blueprints
+        </Link>
       </nav>
     </>
   );
@@ -55,6 +63,7 @@ const AppContent: React.FC = () => {
           <Route path="/contracts/new" element={<CreateContract />} />
           <Route path="/contracts/:id" element={<ContractDetail />} />
           <Route path="/contracts/:id/edit" element={<EditContract />} />
+          <Route path="/blueprints" element={<Blueprints />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

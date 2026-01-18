@@ -29,7 +29,7 @@ This platform brings everything together in one place with a clean, intuitive in
 
 ## 📹 Demo
 
-![Product Demo](./screenshots/demo.mp4)
+![Dashboard Detail](./screenshots/dashboard.png)
 *Dashboard with contract overview and quick stats*
 
 ![Contract Detail](./screenshots/contract_detail.png)

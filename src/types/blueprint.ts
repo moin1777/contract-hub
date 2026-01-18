@@ -1,5 +1,21 @@
 import type { ContractFormData, ContractStatus } from './contract';
 
+// Field types for blueprint configuration
+export type BlueprintFieldType = 'text' | 'date' | 'signature' | 'checkbox';
+
+export interface BlueprintField {
+  id: string;
+  type: BlueprintFieldType;
+  label: string;
+  required: boolean;
+  position: {
+    x: number;
+    y: number;
+  };
+  placeholder?: string;
+  defaultValue?: string | boolean;
+}
+
 export interface Blueprint {
   id: string;
   name: string;
@@ -8,6 +24,10 @@ export interface Blueprint {
   category: BlueprintCategory;
   template: Partial<ContractFormData>;
   color: string;
+  fields: BlueprintField[];
+  isCustom?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export type BlueprintCategory = 'service' | 'employment' | 'sales' | 'partnership' | 'nda' | 'other';
@@ -35,6 +55,12 @@ export const defaultBlueprints: Blueprint[] = [
       status: 'draft' as ContractStatus,
       value: 5000,
     },
+    fields: [
+      { id: 'f1', type: 'text', label: 'Service Provider Name', required: true, position: { x: 0, y: 0 } },
+      { id: 'f2', type: 'text', label: 'Scope of Work', required: true, position: { x: 0, y: 1 } },
+      { id: 'f3', type: 'date', label: 'Service Start Date', required: true, position: { x: 0, y: 2 } },
+      { id: 'f4', type: 'signature', label: 'Provider Signature', required: true, position: { x: 0, y: 3 } },
+    ],
   },
   {
     id: 'bp-employment-contract',
@@ -49,6 +75,13 @@ export const defaultBlueprints: Blueprint[] = [
       status: 'draft' as ContractStatus,
       value: 75000,
     },
+    fields: [
+      { id: 'f1', type: 'text', label: 'Employee Name', required: true, position: { x: 0, y: 0 } },
+      { id: 'f2', type: 'text', label: 'Job Title', required: true, position: { x: 0, y: 1 } },
+      { id: 'f3', type: 'date', label: 'Start Date', required: true, position: { x: 0, y: 2 } },
+      { id: 'f4', type: 'checkbox', label: 'Full-time Position', required: false, position: { x: 0, y: 3 }, defaultValue: true },
+      { id: 'f5', type: 'signature', label: 'Employee Signature', required: true, position: { x: 0, y: 4 } },
+    ],
   },
   {
     id: 'bp-sales-agreement',
@@ -63,6 +96,12 @@ export const defaultBlueprints: Blueprint[] = [
       status: 'draft' as ContractStatus,
       value: 10000,
     },
+    fields: [
+      { id: 'f1', type: 'text', label: 'Buyer Name', required: true, position: { x: 0, y: 0 } },
+      { id: 'f2', type: 'text', label: 'Product/Service Description', required: true, position: { x: 0, y: 1 } },
+      { id: 'f3', type: 'date', label: 'Delivery Date', required: true, position: { x: 0, y: 2 } },
+      { id: 'f4', type: 'signature', label: 'Buyer Signature', required: true, position: { x: 0, y: 3 } },
+    ],
   },
   {
     id: 'bp-nda',
@@ -77,6 +116,14 @@ export const defaultBlueprints: Blueprint[] = [
       status: 'draft' as ContractStatus,
       value: 0,
     },
+    fields: [
+      { id: 'f1', type: 'text', label: 'Disclosing Party', required: true, position: { x: 0, y: 0 } },
+      { id: 'f2', type: 'text', label: 'Receiving Party', required: true, position: { x: 0, y: 1 } },
+      { id: 'f3', type: 'date', label: 'Effective Date', required: true, position: { x: 0, y: 2 } },
+      { id: 'f4', type: 'checkbox', label: 'Mutual NDA', required: false, position: { x: 0, y: 3 }, defaultValue: false },
+      { id: 'f5', type: 'signature', label: 'Party 1 Signature', required: true, position: { x: 0, y: 4 } },
+      { id: 'f6', type: 'signature', label: 'Party 2 Signature', required: true, position: { x: 1, y: 4 } },
+    ],
   },
   {
     id: 'bp-partnership',
@@ -91,6 +138,14 @@ export const defaultBlueprints: Blueprint[] = [
       status: 'draft' as ContractStatus,
       value: 50000,
     },
+    fields: [
+      { id: 'f1', type: 'text', label: 'Partner 1 Name', required: true, position: { x: 0, y: 0 } },
+      { id: 'f2', type: 'text', label: 'Partner 2 Name', required: true, position: { x: 1, y: 0 } },
+      { id: 'f3', type: 'text', label: 'Partnership Name', required: true, position: { x: 0, y: 1 } },
+      { id: 'f4', type: 'date', label: 'Effective Date', required: true, position: { x: 0, y: 2 } },
+      { id: 'f5', type: 'signature', label: 'Partner 1 Signature', required: true, position: { x: 0, y: 3 } },
+      { id: 'f6', type: 'signature', label: 'Partner 2 Signature', required: true, position: { x: 1, y: 3 } },
+    ],
   },
   {
     id: 'bp-lease-agreement',
@@ -105,6 +160,15 @@ export const defaultBlueprints: Blueprint[] = [
       status: 'draft' as ContractStatus,
       value: 24000,
     },
+    fields: [
+      { id: 'f1', type: 'text', label: 'Landlord Name', required: true, position: { x: 0, y: 0 } },
+      { id: 'f2', type: 'text', label: 'Tenant Name', required: true, position: { x: 0, y: 1 } },
+      { id: 'f3', type: 'text', label: 'Property Address', required: true, position: { x: 0, y: 2 } },
+      { id: 'f4', type: 'date', label: 'Lease Start Date', required: true, position: { x: 0, y: 3 } },
+      { id: 'f5', type: 'date', label: 'Lease End Date', required: true, position: { x: 1, y: 3 } },
+      { id: 'f6', type: 'signature', label: 'Landlord Signature', required: true, position: { x: 0, y: 4 } },
+      { id: 'f7', type: 'signature', label: 'Tenant Signature', required: true, position: { x: 1, y: 4 } },
+    ],
   },
   {
     id: 'bp-consulting',
@@ -119,6 +183,13 @@ export const defaultBlueprints: Blueprint[] = [
       status: 'draft' as ContractStatus,
       value: 15000,
     },
+    fields: [
+      { id: 'f1', type: 'text', label: 'Consultant Name', required: true, position: { x: 0, y: 0 } },
+      { id: 'f2', type: 'text', label: 'Consulting Scope', required: true, position: { x: 0, y: 1 } },
+      { id: 'f3', type: 'date', label: 'Project Start Date', required: true, position: { x: 0, y: 2 } },
+      { id: 'f4', type: 'date', label: 'Project End Date', required: false, position: { x: 1, y: 2 } },
+      { id: 'f5', type: 'signature', label: 'Consultant Signature', required: true, position: { x: 0, y: 3 } },
+    ],
   },
   {
     id: 'bp-contractor',
@@ -133,5 +204,13 @@ export const defaultBlueprints: Blueprint[] = [
       status: 'draft' as ContractStatus,
       value: 8000,
     },
+    fields: [
+      { id: 'f1', type: 'text', label: 'Contractor Name', required: true, position: { x: 0, y: 0 } },
+      { id: 'f2', type: 'text', label: 'Company Name', required: true, position: { x: 0, y: 1 } },
+      { id: 'f3', type: 'text', label: 'Services Description', required: true, position: { x: 0, y: 2 } },
+      { id: 'f4', type: 'date', label: 'Contract Start Date', required: true, position: { x: 0, y: 3 } },
+      { id: 'f5', type: 'checkbox', label: 'Agrees to Terms', required: true, position: { x: 0, y: 4 }, defaultValue: false },
+      { id: 'f6', type: 'signature', label: 'Contractor Signature', required: true, position: { x: 0, y: 5 } },
+    ],
   },
 ];

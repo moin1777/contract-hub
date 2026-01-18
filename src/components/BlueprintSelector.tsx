@@ -10,10 +10,18 @@ import {
   UserCheck,
   FileText,
   ArrowRight,
-  X
+  X,
+  Type,
+  Calendar,
+  CheckSquare,
+  PenTool,
+  Edit2,
 } from 'lucide-react';
 import type { Blueprint, BlueprintCategory } from '../types/blueprint';
-import { defaultBlueprints, blueprintCategories } from '../types/blueprint';
+import { blueprintCategories } from '../types/blueprint';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import { updateBlueprint, addBlueprint } from '../store/blueprintSlice';
+import BlueprintEditor from './BlueprintEditor';
 
 interface BlueprintSelectorProps {
   onSelect: (blueprint: Blueprint | null) => void;
@@ -32,18 +40,59 @@ const iconMap: Record<string, React.FC<{ size?: number }>> = {
   FileText,
 };
 
+const fieldTypeIcons: Record<string, React.FC<{ size?: number; className?: string }>> = {
+  text: Type,
+  date: Calendar,
+  checkbox: CheckSquare,
+  signature: PenTool,
+};
+
 const BlueprintSelector: React.FC<BlueprintSelectorProps> = ({ onSelect, onSkip }) => {
+  const dispatch = useAppDispatch();
+  const blueprints = useAppSelector((state) => state.blueprints.blueprints);
   const [selectedCategory, setSelectedCategory] = useState<BlueprintCategory | 'all'>('all');
   const [selectedBlueprint, setSelectedBlueprint] = useState<Blueprint | null>(null);
+  const [showEditor, setShowEditor] = useState(false);
 
   const filteredBlueprints = selectedCategory === 'all'
-    ? defaultBlueprints
-    : defaultBlueprints.filter((bp) => bp.category === selectedCategory);
+    ? blueprints
+    : blueprints.filter((bp) => bp.category === selectedCategory);
 
   const handleUseBlueprint = () => {
     if (selectedBlueprint) {
       onSelect(selectedBlueprint);
     }
+  };
+
+  const handleEditBlueprint = () => {
+    setShowEditor(true);
+  };
+
+  const handleSaveBlueprint = (blueprintData: Omit<Blueprint, 'id' | 'createdAt' | 'updatedAt' | 'isCustom'>) => {
+    if (selectedBlueprint) {
+      // Update existing blueprint or create as custom copy
+      if (selectedBlueprint.isCustom) {
+        dispatch(updateBlueprint({
+          id: selectedBlueprint.id,
+          updates: blueprintData,
+        }));
+        // Update selected blueprint with new data
+        setSelectedBlueprint({
+          ...selectedBlueprint,
+          ...blueprintData,
+        });
+      } else {
+        // Create a custom copy of the default blueprint
+        dispatch(addBlueprint(blueprintData));
+        // Find the newly created blueprint (it will be the last custom one)
+        // We'll update the selection after the state updates
+      }
+    }
+    setShowEditor(false);
+  };
+
+  const handleCloseEditor = () => {
+    setShowEditor(false);
   };
 
   const getIcon = (iconName: string) => {
@@ -163,15 +212,53 @@ const BlueprintSelector: React.FC<BlueprintSelectorProps> = ({ onSelect, onSkip 
                 </p>
               </div>
             )}
+            {selectedBlueprint.fields && selectedBlueprint.fields.length > 0 && (
+              <div>
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Custom Fields</span>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {selectedBlueprint.fields.map((field) => {
+                    const FieldIcon = fieldTypeIcons[field.type] || Type;
+                    return (
+                      <span
+                        key={field.id}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-sm bg-white border border-gray-200"
+                      >
+                        <FieldIcon size={14} className="text-gray-400" />
+                        {field.label}
+                        {field.required && <span className="text-red-500">*</span>}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
-          <button
-            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
-            onClick={handleUseBlueprint}
-          >
-            Use this Blueprint
-            <ArrowRight size={18} />
-          </button>
+          <div className="flex gap-3">
+            <button
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+              onClick={handleEditBlueprint}
+            >
+              <Edit2 size={18} />
+              Edit this Blueprint
+            </button>
+            <button
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+              onClick={handleUseBlueprint}
+            >
+              Use this Blueprint
+              <ArrowRight size={18} />
+            </button>
+          </div>
         </div>
+      )}
+
+      {/* Blueprint Editor Modal */}
+      {showEditor && selectedBlueprint && (
+        <BlueprintEditor
+          blueprint={selectedBlueprint}
+          onSave={handleSaveBlueprint}
+          onCancel={handleCloseEditor}
+        />
       )}
     </div>
   );

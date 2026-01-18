@@ -1,15 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import type { ContractFormData, ContractStatus, Contract } from '../types/contract';
+import { Type, Calendar, CheckSquare, PenTool } from 'lucide-react';
+import type { ContractFormData, ContractStatus, Contract, CustomFieldValue } from '../types/contract';
+import type { BlueprintField } from '../types/blueprint';
 
 interface ContractFormProps {
   initialData?: Contract | Partial<ContractFormData>;
+  blueprintFields?: BlueprintField[];
   onSubmit: (data: ContractFormData) => void;
   onCancel: () => void;
   isEditing?: boolean;
 }
 
+const fieldTypeIcons: Record<string, React.FC<{ size?: number; className?: string }>> = {
+  text: Type,
+  date: Calendar,
+  checkbox: CheckSquare,
+  signature: PenTool,
+};
+
 const ContractForm: React.FC<ContractFormProps> = ({
   initialData,
+  blueprintFields = [],
   onSubmit,
   onCancel,
   isEditing = false,
@@ -22,9 +33,11 @@ const ContractForm: React.FC<ContractFormProps> = ({
     startDate: '',
     endDate: '',
     value: 0,
+    customFields: [],
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof ContractFormData, string>>>({});
+  const [customFieldErrors, setCustomFieldErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (initialData) {
@@ -36,12 +49,27 @@ const ContractForm: React.FC<ContractFormProps> = ({
         startDate: initialData.startDate || '',
         endDate: initialData.endDate || '',
         value: initialData.value || 0,
+        customFields: initialData.customFields || [],
       });
     }
   }, [initialData]);
 
+  // Initialize custom fields when blueprint fields are provided
+  useEffect(() => {
+    if (blueprintFields.length > 0 && (!formData.customFields || formData.customFields.length === 0)) {
+      const initialCustomFields: CustomFieldValue[] = blueprintFields.map((field) => ({
+        fieldId: field.id,
+        label: field.label,
+        type: field.type,
+        value: field.type === 'checkbox' ? false : '',
+      }));
+      setFormData((prev) => ({ ...prev, customFields: initialCustomFields }));
+    }
+  }, [blueprintFields, formData.customFields]);
+
   const validate = (): boolean => {
     const newErrors: Partial<Record<keyof ContractFormData, string>> = {};
+    const newCustomFieldErrors: Record<string, string> = {};
 
     if (!formData.clientName.trim()) {
       newErrors.clientName = 'Client name is required';
@@ -62,8 +90,23 @@ const ContractForm: React.FC<ContractFormProps> = ({
       newErrors.value = 'Value must be positive';
     }
 
+    // Validate required custom fields
+    blueprintFields.forEach((field) => {
+      if (field.required) {
+        const customField = formData.customFields?.find((cf) => cf.fieldId === field.id);
+        if (!customField) {
+          newCustomFieldErrors[field.id] = `${field.label} is required`;
+        } else if (field.type === 'text' || field.type === 'date' || field.type === 'signature') {
+          if (!customField.value || (typeof customField.value === 'string' && !customField.value.trim())) {
+            newCustomFieldErrors[field.id] = `${field.label} is required`;
+          }
+        }
+      }
+    });
+
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setCustomFieldErrors(newCustomFieldErrors);
+    return Object.keys(newErrors).length === 0 && Object.keys(newCustomFieldErrors).length === 0;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -83,6 +126,22 @@ const ContractForm: React.FC<ContractFormProps> = ({
     }));
     if (errors[name as keyof ContractFormData]) {
       setErrors((prev) => ({ ...prev, [name]: undefined }));
+    }
+  };
+
+  const handleCustomFieldChange = (fieldId: string, value: string | boolean) => {
+    setFormData((prev) => ({
+      ...prev,
+      customFields: prev.customFields?.map((cf) =>
+        cf.fieldId === fieldId ? { ...cf, value } : cf
+      ),
+    }));
+    if (customFieldErrors[fieldId]) {
+      setCustomFieldErrors((prev) => {
+        const updated = { ...prev };
+        delete updated[fieldId];
+        return updated;
+      });
     }
   };
 
@@ -212,6 +271,90 @@ const ContractForm: React.FC<ContractFormProps> = ({
           {errors.endDate && <span className="text-xs text-red-500">{errors.endDate}</span>}
         </div>
       </div>
+
+      {/* Custom Fields Section from Blueprint */}
+      {blueprintFields.length > 0 && (
+        <div className="border-t border-gray-200 pt-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Template Fields</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {blueprintFields.map((field) => {
+              const FieldIcon = fieldTypeIcons[field.type] || Type;
+              const customField = formData.customFields?.find((cf) => cf.fieldId === field.id);
+              const hasError = !!customFieldErrors[field.id];
+
+              return (
+                <div key={field.id} className={`flex flex-col gap-2 ${field.type === 'signature' ? 'md:col-span-2' : ''}`}>
+                  <label
+                    htmlFor={`custom-${field.id}`}
+                    className="inline-flex items-center gap-2 text-sm font-medium text-gray-700"
+                  >
+                    <FieldIcon size={14} className="text-gray-400" />
+                    {field.label}
+                    {field.required && <span className="text-red-500">*</span>}
+                  </label>
+
+                  {field.type === 'text' && (
+                    <input
+                      type="text"
+                      id={`custom-${field.id}`}
+                      value={(customField?.value as string) || ''}
+                      onChange={(e) => handleCustomFieldChange(field.id, e.target.value)}
+                      placeholder={`Enter ${field.label.toLowerCase()}`}
+                      className={inputClass(hasError)}
+                    />
+                  )}
+
+                  {field.type === 'date' && (
+                    <input
+                      type="date"
+                      id={`custom-${field.id}`}
+                      value={(customField?.value as string) || ''}
+                      onChange={(e) => handleCustomFieldChange(field.id, e.target.value)}
+                      className={inputClass(hasError)}
+                    />
+                  )}
+
+                  {field.type === 'checkbox' && (
+                    <label className="inline-flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        id={`custom-${field.id}`}
+                        checked={(customField?.value as boolean) || false}
+                        onChange={(e) => handleCustomFieldChange(field.id, e.target.checked)}
+                        className="w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                      />
+                      <span className="text-sm text-gray-600">Check if applicable</span>
+                    </label>
+                  )}
+
+                  {field.type === 'signature' && (
+                    <div className="flex flex-col gap-2">
+                      <input
+                        type="text"
+                        id={`custom-${field.id}`}
+                        value={(customField?.value as string) || ''}
+                        onChange={(e) => handleCustomFieldChange(field.id, e.target.value)}
+                        placeholder="Type your full name as signature"
+                        className={inputClass(hasError)}
+                      />
+                      {customField?.value && typeof customField.value === 'string' && customField.value.trim() && (
+                        <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                          <p className="text-xs text-gray-500 mb-1">Signature Preview:</p>
+                          <p className="text-xl italic font-serif text-gray-800">{customField.value}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {hasError && (
+                    <span className="text-xs text-red-500">{customFieldErrors[field.id]}</span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
         <button

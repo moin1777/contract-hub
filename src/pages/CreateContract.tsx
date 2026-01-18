@@ -6,7 +6,7 @@ import { addContract } from '../store/contractSlice';
 import ContractForm from '../components/ContractForm';
 import BlueprintSelector from '../components/BlueprintSelector';
 import type { ContractFormData } from '../types/contract';
-import type { Blueprint } from '../types/blueprint';
+import type { Blueprint, BlueprintField } from '../types/blueprint';
 
 type CreateStep = 'blueprint' | 'form';
 
@@ -25,6 +25,9 @@ const CreateContract: React.FC = () => {
   const [step, setStep] = useState<CreateStep>(stateBlueprint ? 'form' : 'blueprint');
   const [initialData, setInitialData] = useState<Partial<ContractFormData> | undefined>(
     stateBlueprint?.template
+  );
+  const [blueprintFields, setBlueprintFields] = useState<BlueprintField[]>(
+    stateBlueprint?.fields || []
   );
   const [selectedBlueprintName, setSelectedBlueprintName] = useState<string | null>(
     stateBlueprint?.name || null
@@ -46,6 +49,7 @@ const CreateContract: React.FC = () => {
     if (blueprint) {
       setInitialData(blueprint.template);
       setSelectedBlueprintName(blueprint.name);
+      setBlueprintFields(blueprint.fields || []);
     }
     setStep('form');
   };
@@ -53,6 +57,7 @@ const CreateContract: React.FC = () => {
   const handleSkipBlueprint = () => {
     setInitialData(undefined);
     setSelectedBlueprintName(null);
+    setBlueprintFields([]);
     setStep('form');
   };
 
@@ -60,6 +65,7 @@ const CreateContract: React.FC = () => {
     setStep('blueprint');
     setInitialData(undefined);
     setSelectedBlueprintName(null);
+    setBlueprintFields([]);
   };
 
   return (
@@ -96,6 +102,7 @@ const CreateContract: React.FC = () => {
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <ContractForm
             initialData={initialData}
+            blueprintFields={blueprintFields}
             onSubmit={handleSubmit}
             onCancel={() => navigate(-1)}
           />

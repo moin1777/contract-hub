@@ -1,5 +1,13 @@
 export type ContractStatus = 'draft' | 'active' | 'expired' | 'terminated';
 
+// Custom field values stored on a contract
+export interface CustomFieldValue {
+  fieldId: string;
+  label: string;
+  type: 'text' | 'date' | 'signature' | 'checkbox';
+  value: string | boolean;
+}
+
 export interface Contract {
   id: string;
   clientName: string;
@@ -11,6 +19,7 @@ export interface Contract {
   value: number;
   createdAt: string;
   updatedAt: string;
+  customFields?: CustomFieldValue[];
 }
 
 export interface ContractFormData {
@@ -21,4 +30,5 @@ export interface ContractFormData {
   startDate: string;
   endDate: string;
   value: number;
+  customFields?: CustomFieldValue[];
 }

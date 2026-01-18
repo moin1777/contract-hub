@@ -272,7 +272,7 @@ const ContractDetail: React.FC = () => {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Contract Details</h3>
           <div className="space-y-4">
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+              <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
                 <User size={18} className="text-gray-500" />
               </div>
               <div>
@@ -282,7 +282,7 @@ const ContractDetail: React.FC = () => {
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+              <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
                 <DollarSign size={18} className="text-gray-500" />
               </div>
               <div>
@@ -292,7 +292,7 @@ const ContractDetail: React.FC = () => {
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+              <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
                 <Calendar size={18} className="text-gray-500" />
               </div>
               <div>
@@ -302,7 +302,7 @@ const ContractDetail: React.FC = () => {
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+              <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
                 <Calendar size={18} className="text-gray-500" />
               </div>
               <div>
@@ -312,7 +312,7 @@ const ContractDetail: React.FC = () => {
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+              <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
                 <Clock size={18} className="text-gray-500" />
               </div>
               <div>
@@ -324,7 +324,7 @@ const ContractDetail: React.FC = () => {
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+              <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
                 <FileText size={18} className="text-gray-500" />
               </div>
               <div>

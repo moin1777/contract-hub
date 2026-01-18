@@ -210,11 +210,9 @@ const ContractForm: React.FC<ContractFormProps> = ({
             type="number"
             id="value"
             name="value"
-            value={formData.value}
+            value={formData.value || ''}
             onChange={handleChange}
-            placeholder="0"
-            min="0"
-            step="100"
+            placeholder="Enter amount"
             className={inputClass(!!errors.value)}
           />
           {errors.value && <span className="text-xs text-red-500">{errors.value}</span>}
